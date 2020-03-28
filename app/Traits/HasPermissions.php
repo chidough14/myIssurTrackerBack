@@ -19,15 +19,20 @@ trait HasPermissions {
         })->count();
     }
 
+    private function getPermissionIdsBySlug($permissions) {
+        return Permission::whereIn('slug', $permissions)->get()->pluck('id')->toArray();
+    }
+
     public function givePermissionTo (...$permissions) {
-        $this->permissions()->attach($permissions);
+
+        $this->permissions()->attach($this->getPermissionIdsBySlug($permissions));
     }
 
     public function setPermissions (...$permissions) {
-        $this->permissions()->sync($permissions);
+        $this->permissions()->sync($this->getPermissionIdsBySlug($permissions));
     }
 
     public function detachPermissions (...$permissions) {
-        $this->permissions()->detach($permissions);
+        $this->permissions()->detach($this->getPermissionIdsBySlug($permissions));
     }
 }
